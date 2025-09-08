@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
     const props = defineProps({
         propA: {
             type: String,
@@ -8,7 +9,7 @@
             type: String,
             default: 'Hello World!',
             required: false
-        }
+        },
     })
 
     const emits = defineEmits<{
