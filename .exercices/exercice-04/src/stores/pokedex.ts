@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export interface PokedexResponse {
-  names: { name: string }[];
+  names: { name: string, language: { name: string, url: string } }[];
   pokemon_entries: { pokemon_species: { name: string, url: string } }[]
 }
 
@@ -20,6 +20,7 @@ const extractIdFromUrl = (url: string): number | null => {
 
 
 export const usePokedexStore = defineStore('pokedex', () => {
+  const pokedexNameForCurrentGeneration = ref<string | null>(null)
   const pokedexForCurrentGeneration = ref<PokemonBasicEntries[]>([])
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -36,14 +37,16 @@ export const usePokedexStore = defineStore('pokedex', () => {
         name: entry.pokemon_species.name.substring(0, 1).toUpperCase() + entry.pokemon_species.name.substring(1).toLowerCase(),
         pictureUrl: `https://img.pokemondb.net/sprites/scarlet-violet/icon/${entry.pokemon_species.name}.png`
       }))
+      pokedexNameForCurrentGeneration.value = data.names.find(x => x.language.name === 'en')?.name ?? null
       error.value = null;
     } catch (err: any) {
       error.value = err.message;
       pokedexForCurrentGeneration.value = [];
+      pokedexNameForCurrentGeneration.value = null;
     } finally {
       isLoading.value = false;
     }
   }
 
-  return { pokedexForCurrentGeneration, isLoading, error, fetchPokedexForGenerationId }
+  return { pokedexNameForCurrentGeneration, pokedexForCurrentGeneration, isLoading, error, fetchPokedexForGenerationId }
 });
